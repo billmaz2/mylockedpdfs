@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Folder Gateway — Code 1234</title>
+<title>PDF Folder Access</title>
 <style>
   * { box-sizing: border-box; font-family: system-ui, Arial, sans-serif; }
   body {
@@ -24,31 +24,16 @@
     width: 100%;
     box-shadow: 0 30px 50px rgba(0,0,0,0.7);
   }
-  h1 {
-    margin: 0 0 8px;
-    font-size: 26px;
-    color: #e7f0ff;
-  }
+  h1 { margin: 0 0 8px; font-size: 26px; color: #e7f0ff; }
   .subtitle {
-    color: #9bb5d4;
-    margin-bottom: 24px;
-    font-size: 14px;
-    border-left: 3px solid #2d6db5;
-    padding-left: 12px;
+    color: #9bb5d4; margin-bottom: 24px; font-size: 14px;
+    border-left: 3px solid #2d6db5; padding-left: 12px;
   }
   label {
-    display: block;
-    color: #b6cde9;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
+    display: block; color: #b6cde9; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
   }
-  .row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
   input {
     flex: 1 1 200px;
     background: #0b141f;
@@ -59,221 +44,193 @@
     color: #e2edff;
     outline: none;
   }
-  input:focus {
-    border-color: #3f8eff;
-    box-shadow: 0 0 0 3px #1f6feb44;
-  }
+  input:focus { border-color: #3f8eff; box-shadow: 0 0 0 3px #1f6feb44; }
   button {
-    background: #1f6feb;
-    border: 1px solid #5a9aff;
-    border-radius: 40px;
-    padding: 14px 28px;
-    font-weight: 600;
-    font-size: 16px;
-    color: #fff;
-    cursor: pointer;
-    white-space: nowrap;
+    background: #1f6feb; border: 1px solid #5a9aff; border-radius: 40px;
+    padding: 14px 28px; font-weight: 600; font-size: 16px;
+    color: #fff; cursor: pointer; white-space: nowrap;
   }
   button:hover { background: #2d7ef7; }
-  button:active { transform: scale(0.98); }
   #errorBox {
-    display: none;
-    margin-top: 12px;
-    padding: 10px 16px;
-    background: #4d1f1faa;
-    border-left: 5px solid #ff5e5e;
-    border-radius: 12px;
-    color: #ffa6a6;
-    font-size: 14px;
+    display: none; margin-top: 12px; padding: 10px 16px;
+    background: #4d1f1faa; border-left: 5px solid #ff5e5e;
+    border-radius: 12px; color: #ffa6a6; font-size: 14px;
+  }
+  #loadingBox {
+    display: none; margin-top: 12px; padding: 10px 16px;
+    background: #1f3a5caa; border-left: 5px solid #4d94ff;
+    border-radius: 12px; color: #a6c8ff; font-size: 14px;
   }
   #fileSection {
-    display: none;
-    margin-top: 24px;
-    border-top: 1px dashed #2d4a6e;
-    padding-top: 20px;
+    display: none; margin-top: 24px;
+    border-top: 1px dashed #2d4a6e; padding-top: 20px;
   }
   #fileSection h2 {
-    font-size: 18px;
-    font-weight: 500;
-    color: #c3d9f5;
-    margin: 0 0 14px;
+    font-size: 18px; font-weight: 500; color: #c3d9f5; margin: 0 0 14px;
   }
   .file-item {
-    display: block;
-    background: #101e2e;
-    border: 1px solid #1f3750;
-    border-radius: 12px;
-    padding: 12px 18px;
-    margin-bottom: 8px;
-    text-decoration: none;
-    color: #d2e3ff;
-    font-size: 15px;
-    word-break: break-all;
-    transition: 0.15s;
+    display: block; background: #101e2e; border: 1px solid #1f3750;
+    border-radius: 12px; padding: 12px 18px; margin-bottom: 8px;
+    text-decoration: none; color: #d2e3ff; font-size: 15px;
+    word-break: break-all; transition: 0.15s;
   }
   .file-item:hover {
-    background: #1c2f45;
-    border-color: #3b77c0;
-    transform: translateX(4px);
+    background: #1c2f45; border-color: #3b77c0; transform: translateX(4px);
   }
   .file-item .badge {
-    float: right;
-    font-size: 11px;
-    background: #1d3147;
-    border: 1px solid #314e70;
-    color: #7196bb;
-    padding: 2px 10px;
-    border-radius: 30px;
-    margin-left: 10px;
+    float: right; font-size: 11px; background: #1d3147;
+    border: 1px solid #314e70; color: #7196bb;
+    padding: 2px 10px; border-radius: 30px; margin-left: 10px;
   }
   #resetBtn {
-    display: none;
-    margin-top: 18px;
-    background: none;
-    border: none;
-    color: #4d7eb3;
-    text-decoration: underline;
-    font-size: 13px;
-    padding: 0;
-    cursor: pointer;
-    width: auto;
+    display: none; margin-top: 18px; background: none; border: none;
+    color: #4d7eb3; text-decoration: underline; font-size: 13px;
+    padding: 0; cursor: pointer; width: auto;
   }
-  #debug {
-    display: none;
-    margin-top: 20px;
-    padding: 10px;
-    background: #000;
-    color: #0f0;
-    font-family: monospace;
-    font-size: 12px;
-    border-radius: 8px;
-    white-space: pre-wrap;
+  .empty-msg {
+    color: #7e9bbe; padding: 20px; text-align: center;
+    background: #0b141f; border-radius: 16px;
+    border: 1px dashed #314e70; font-style: italic;
   }
 </style>
 </head>
 <body>
 
 <div class="card">
-  <h1>🔐 Folder Gateway</h1>
-  <div class="subtitle">Enter code <strong>1234</strong> to see all files.</div>
+  <h1>🔐 PDF Folder</h1>
+  <div class="subtitle">Enter code <strong>1234</strong> to see all PDF files in the folder.</div>
 
-  <!-- LOGIN SECTION -->
+  <!-- LOGIN -->
   <div id="loginSection">
     <label for="accessCode">Access Code</label>
     <div class="row">
-      <input type="text" id="accessCode" placeholder="Type 1234 here" autocomplete="off">
+      <input type="text" id="accessCode" placeholder="Type 1234" autocomplete="off">
       <button id="okBtn" type="button">🔓 OK</button>
     </div>
     <div id="errorBox">❌ Wrong code. Try again.</div>
+    <div id="loadingBox">⏳ Loading PDF files from GitHub…</div>
   </div>
 
-  <!-- FILE LIST SECTION -->
+  <!-- FILE LIST -->
   <div id="fileSection">
-    <h2>📁 Files in this folder (<span id="fileCount">0</span>)</h2>
+    <h2>📄 PDF files (<span id="fileCount">0</span>)</h2>
     <div id="fileList"></div>
   </div>
 
   <button id="resetBtn" type="button">↻ Use another code</button>
-
-  <!-- DEBUG OUTPUT (visible for troubleshooting) -->
-  <div id="debug"></div>
 </div>
 
 <script>
 // ============================================================
-// CONFIGURATION — change these 2 lines only
+// CONFIGURATION — change these 3 lines only
 // ============================================================
 
 var SECRET_CODE = "1234";
 
-// ⚠️ REPLACE with your real GitHub folder URL (must end with /)
-// Example: "https://github.com/alice/myproject/raw/main/files/"
-var GITHUB_FOLDER_BASE = "https://github.com/yourusername/yourrepo/raw/main/yourfolder/";
-
-// ⚠️ REPLACE with the actual file names inside your GitHub folder
-var FILE_NAMES = [
-  "document.pdf",
-  "image.png",
-  "data.csv",
-  "notes.txt",
-  "readme.md"
-];
+// Your GitHub repo info (user, repo, branch, folder)
+// ⚠️ Fill these with your real values
+var GITHUB_USER   = "yourusername";     // e.g. "alice"
+var GITHUB_REPO   = "yourrepo";         // e.g. "myproject"
+var GITHUB_BRANCH = "main";             // usually "main" (or "master")
+var GITHUB_FOLDER = "pdfs";             // folder name inside the repo ("" = root)
 
 // ============================================================
-// SCRIPT LOGIC — do not edit below
+// SCRIPT — do not edit below
 // ============================================================
 
-// Debug helper: shows messages on screen
-function debug(msg) {
-  var box = document.getElementById('debug');
-  box.style.display = 'block';
-  box.textContent += '> ' + msg + '\n';
-}
-
-debug('Script loaded. Code = ' + SECRET_CODE);
-debug('Folder URL = ' + GITHUB_FOLDER_BASE);
-debug('Files = ' + FILE_NAMES.length + ' items');
-
-// Grab elements
 var input     = document.getElementById('accessCode');
 var okBtn     = document.getElementById('okBtn');
 var errorBox  = document.getElementById('errorBox');
+var loadingBox= document.getElementById('loadingBox');
 var loginSec  = document.getElementById('loginSection');
 var fileSec   = document.getElementById('fileSection');
 var fileList  = document.getElementById('fileList');
 var fileCount = document.getElementById('fileCount');
 var resetBtn  = document.getElementById('resetBtn');
 
-// Focus input on load
 setTimeout(function () { input.focus(); }, 100);
 
-// Unlock function
-function unlock() {
-  debug('unlock() called');
+// Build the GitHub API URL for the folder
+function buildApiUrl() {
+  var path = GITHUB_FOLDER ? encodeURIComponent(GITHUB_FOLDER) : "";
+  return "https://api.github.com/repos/" + GITHUB_USER + "/" +
+         GITHUB_REPO + "/contents/" + path +
+         "?ref=" + GITHUB_BRANCH;
+}
 
-  // Hide login, show file list
-  loginSec.style.display = 'none';
+// Fetch the folder contents and show only .pdf files
+function loadPdfs() {
+  loadingBox.style.display = 'block';
   errorBox.style.display = 'none';
-  fileSec.style.display = 'block';
-  resetBtn.style.display = 'inline-block';
 
-  // Build links
-  fileList.innerHTML = '';
+  var apiUrl = buildApiUrl();
+  console.log('Fetching:', apiUrl);
 
-  var base = GITHUB_FOLDER_BASE;
-  if (base.charAt(base.length - 1) !== '/') {
-    base = base + '/';
-  }
+  fetch(apiUrl)
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error('GitHub API error: ' + response.status + ' ' + response.statusText);
+      }
+      return response.json();
+    })
+    .then(function (files) {
+      loadingBox.style.display = 'none';
 
-  for (var i = 0; i < FILE_NAMES.length; i++) {
-    var name = FILE_NAMES[i];
-    var url  = base + encodeURIComponent(name);
+      if (!Array.isArray(files)) {
+        throw new Error('Unexpected API response');
+      }
 
-    var a = document.createElement('a');
-    a.className = 'file-item';
-    a.href = url;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    a.innerHTML = '📄 ' + name + '<span class="badge">open</span>';
+      // Filter only PDF files
+      var pdfs = files.filter(function (f) {
+        return f.type === 'file' && f.name.toLowerCase().endsWith('.pdf');
+      });
 
-    fileList.appendChild(a);
-  }
+      if (pdfs.length === 0) {
+        fileList.innerHTML = '<div class="empty-msg">📭 No PDF files found in this folder.</div>';
+        fileCount.textContent = '0';
+      } else {
+        fileList.innerHTML = '';
+        pdfs.forEach(function (file) {
+          var a = document.createElement('a');
+          a.className = 'file-item';
+          a.href = file.download_url;   // direct raw download URL
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.innerHTML = '📄 ' + file.name + '<span class="badge">open</span>';
+          fileList.appendChild(a);
+        });
+        fileCount.textContent = pdfs.length;
+      }
 
-  fileCount.textContent = FILE_NAMES.length;
-  debug('Rendered ' + FILE_NAMES.length + ' file links');
+      // Show file section, hide login
+      loginSec.style.display = 'none';
+      fileSec.style.display = 'block';
+      resetBtn.style.display = 'inline-block';
+    })
+    .catch(function (err) {
+      loadingBox.style.display = 'none';
+      console.error(err);
+
+      var msg = '❌ Could not load folder. ';
+      if (err.message.indexOf('404') > -1) {
+        msg += 'Check your GITHUB_USER / GITHUB_REPO / GITHUB_FOLDER.';
+      } else if (err.message.indexOf('403') > -1) {
+        msg += 'GitHub API rate limit. Wait 1 hour or host on GitHub Pages.';
+      } else {
+        msg += err.message;
+      }
+      errorBox.textContent = msg;
+      errorBox.style.display = 'block';
+    });
 }
 
 // Check code
 function checkCode() {
-  var typed = input.value;
-  debug('Typed: "' + typed + '" | Expected: "' + SECRET_CODE + '"');
-
-  // Compare (trim only whitespace at ends — do NOT lowercase)
-  if (typed.trim() === SECRET_CODE) {
-    debug('✅ Code matched!');
-    unlock();
+  if (input.value.trim() === SECRET_CODE) {
+    errorBox.style.display = 'none';
+    loadPdfs();
   } else {
-    debug('❌ Code did NOT match');
+    errorBox.textContent = '❌ Wrong code. Try again.';
     errorBox.style.display = 'block';
     input.focus();
     input.select();
@@ -282,17 +239,17 @@ function checkCode() {
 
 // Reset
 function reset() {
-  debug('reset() called');
   loginSec.style.display = 'block';
   fileSec.style.display = 'none';
   resetBtn.style.display = 'none';
   errorBox.style.display = 'none';
+  loadingBox.style.display = 'none';
   fileList.innerHTML = '';
   input.value = '';
   input.focus();
 }
 
-// Attach events
+// Events
 okBtn.addEventListener('click', function (e) {
   e.preventDefault();
   checkCode();
@@ -309,8 +266,6 @@ resetBtn.addEventListener('click', function (e) {
   e.preventDefault();
   reset();
 });
-
-debug('Events attached. Ready.');
 </script>
 
 </body>
