@@ -2,26 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PDF Folder Access</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Folder — Secured</title>
 <style>
   * { box-sizing: border-box; font-family: system-ui, Arial, sans-serif; }
   body {
-    margin: 0;
-    min-height: 100vh;
+    margin: 0; min-height: 100vh;
     background: linear-gradient(145deg, #0e1a2b, #1b2c42);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    color: #e2edff;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; color: #e2edff;
   }
   .card {
-    background: #162232ee;
-    border: 1px solid #2e4a6b;
-    border-radius: 24px;
-    padding: 32px 28px;
-    max-width: 640px;
-    width: 100%;
+    background: #162232ee; border: 1px solid #2e4a6b;
+    border-radius: 24px; padding: 32px 28px;
+    max-width: 640px; width: 100%;
     box-shadow: 0 30px 50px rgba(0,0,0,0.7);
   }
   h1 { margin: 0 0 8px; font-size: 26px; color: #e7f0ff; }
@@ -35,26 +29,29 @@
   }
   .row { display: flex; gap: 10px; flex-wrap: wrap; }
   input {
-    flex: 1 1 200px;
-    background: #0b141f;
-    border: 1px solid #2a405c;
-    border-radius: 40px;
-    padding: 14px 20px;
-    font-size: 16px;
-    color: #e2edff;
-    outline: none;
+    flex: 1 1 200px; background: #0b141f;
+    border: 1px solid #2a405c; border-radius: 40px;
+    padding: 14px 20px; font-size: 16px;
+    color: #e2edff; outline: none;
   }
   input:focus { border-color: #3f8eff; box-shadow: 0 0 0 3px #1f6feb44; }
   button {
-    background: #1f6feb; border: 1px solid #5a9aff; border-radius: 40px;
-    padding: 14px 28px; font-weight: 600; font-size: 16px;
-    color: #fff; cursor: pointer; white-space: nowrap;
+    background: #1f6feb; border: 1px solid #5a9aff;
+    border-radius: 40px; padding: 14px 28px;
+    font-weight: 600; font-size: 16px; color: #fff;
+    cursor: pointer; white-space: nowrap;
   }
   button:hover { background: #2d7ef7; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
   #errorBox {
     display: none; margin-top: 12px; padding: 10px 16px;
     background: #4d1f1faa; border-left: 5px solid #ff5e5e;
     border-radius: 12px; color: #ffa6a6; font-size: 14px;
+  }
+  #successBox {
+    display: none; margin-top: 12px; padding: 10px 16px;
+    background: #1f4d2faa; border-left: 5px solid #3ddc84;
+    border-radius: 12px; color: #a6ffbb; font-size: 14px;
   }
   #loadingBox {
     display: none; margin-top: 12px; padding: 10px 16px;
@@ -66,206 +63,355 @@
     border-top: 1px dashed #2d4a6e; padding-top: 20px;
   }
   #fileSection h2 {
-    font-size: 18px; font-weight: 500; color: #c3d9f5; margin: 0 0 14px;
+    font-size: 18px; font-weight: 500; color: #c3d9f5;
+    margin: 0 0 14px;
   }
   .file-item {
-    display: block; background: #101e2e; border: 1px solid #1f3750;
-    border-radius: 12px; padding: 12px 18px; margin-bottom: 8px;
-    text-decoration: none; color: #d2e3ff; font-size: 15px;
-    word-break: break-all; transition: 0.15s;
+    display: block; background: #101e2e;
+    border: 1px solid #1f3750; border-radius: 12px;
+    padding: 12px 18px; margin-bottom: 8px;
+    text-decoration: none; color: #d2e3ff;
+    font-size: 15px; word-break: break-all;
+    transition: 0.15s;
   }
   .file-item:hover {
-    background: #1c2f45; border-color: #3b77c0; transform: translateX(4px);
+    background: #1c2f45; border-color: #3b77c0;
+    transform: translateX(4px);
   }
   .file-item .badge {
     float: right; font-size: 11px; background: #1d3147;
     border: 1px solid #314e70; color: #7196bb;
     padding: 2px 10px; border-radius: 30px; margin-left: 10px;
   }
-  #resetBtn {
-    display: none; margin-top: 18px; background: none; border: none;
-    color: #4d7eb3; text-decoration: underline; font-size: 13px;
-    padding: 0; cursor: pointer; width: auto;
-  }
   .empty-msg {
     color: #7e9bbe; padding: 20px; text-align: center;
     background: #0b141f; border-radius: 16px;
     border: 1px dashed #314e70; font-style: italic;
   }
+  .link-btn {
+    background: none; border: none; color: #4d7eb3;
+    text-decoration: underline; font-size: 13px;
+    padding: 0; cursor: pointer; width: auto; margin-top: 18px;
+  }
+  .hint { color: #6b86a3; font-size: 12px; margin-top: 8px; }
 </style>
 </head>
 <body>
 
 <div class="card">
-  <h1>🔐 PDF Folder</h1>
-  <div class="subtitle">Enter code <strong>1234</strong> to see all PDF files in the folder.</div>
+  <h1>📄 PDF Folder</h1>
+  <div class="subtitle" id="subtitle">Please set a security code to protect this folder.</div>
 
-  <!-- LOGIN -->
-  <div id="loginSection">
-    <label for="accessCode">Access Code</label>
+  <!-- ========== SETUP (first time only) ========== -->
+  <div id="setupSection" style="display:none;">
+    <label for="newCode">Create your code</label>
     <div class="row">
-      <input type="text" id="accessCode" placeholder="Type 1234" autocomplete="off">
-      <button id="okBtn" type="button">🔓 OK</button>
+      <input type="password" id="newCode" placeholder="Choose a code" autocomplete="new-password">
     </div>
-    <div id="errorBox">❌ Wrong code. Try again.</div>
-    <div id="loadingBox">⏳ Loading PDF files from GitHub…</div>
+    <label for="confirmCode" style="margin-top:14px;">Confirm your code</label>
+    <div class="row">
+      <input type="password" id="confirmCode" placeholder="Repeat code" autocomplete="new-password">
+      <button id="saveBtn" type="button">💾 Save</button>
+    </div>
+    <div class="hint">This code will be stored as a SHA-256 hash — never as plaintext.</div>
+    <div id="setupError" class="error-box" style="display:none;margin-top:12px;padding:10px 16px;background:#4d1f1faa;border-left:5px solid #ff5e5e;border-radius:12px;color:#ffa6a6;font-size:14px;"></div>
   </div>
 
-  <!-- FILE LIST -->
+  <!-- ========== LOGIN (every time after) ========== -->
+  <div id="loginSection" style="display:none;">
+    <label for="accessCode">Enter your code</label>
+    <div class="row">
+      <input type="password" id="accessCode" placeholder="Your code" autocomplete="off">
+      <button id="okBtn" type="button">🔓 Unlock</button>
+    </div>
+    <div id="errorBox">❌ Wrong code. Try again.</div>
+    <button id="forgotBtn" class="link-btn" type="button">Forgot code? Reset folder</button>
+  </div>
+
+  <!-- ========== LOADING ========== -->
+  <div id="loadingBox">⏳ Loading PDF files from GitHub…</div>
+  <div id="successBox"></div>
+
+  <!-- ========== FILE LIST ========== -->
   <div id="fileSection">
     <h2>📄 PDF files (<span id="fileCount">0</span>)</h2>
     <div id="fileList"></div>
+    <button id="lockBtn" class="link-btn" type="button">🔒 Lock again</button>
   </div>
-
-  <button id="resetBtn" type="button">↻ Use another code</button>
 </div>
 
 <script>
 // ============================================================
-// CONFIGURATION — change these 3 lines only
+// CONFIGURATION — change these 4 values only
 // ============================================================
 
-var SECRET_CODE = "1234";
+var GITHUB_USER   = "yourusername";   // ← your GitHub username
+var GITHUB_REPO   = "yourrepo";       // ← your repository name
+var GITHUB_BRANCH = "main";           // ← branch (main or master)
+var GITHUB_FOLDER = "pdfs";           // ← folder with PDFs ("" = root)
 
-// Your GitHub repo info (user, repo, branch, folder)
-// ⚠️ Fill these with your real values
-var GITHUB_USER   = "yourusername";     // e.g. "alice"
-var GITHUB_REPO   = "yourrepo";         // e.g. "myproject"
-var GITHUB_BRANCH = "main";             // usually "main" (or "master")
-var GITHUB_FOLDER = "pdfs";             // folder name inside the repo ("" = root)
+// localStorage key — don't change unless you want to reset
+var STORAGE_KEY = "pdf_folder_code_hash";
 
 // ============================================================
 // SCRIPT — do not edit below
 // ============================================================
 
-var input     = document.getElementById('accessCode');
-var okBtn     = document.getElementById('okBtn');
-var errorBox  = document.getElementById('errorBox');
-var loadingBox= document.getElementById('loadingBox');
-var loginSec  = document.getElementById('loginSection');
-var fileSec   = document.getElementById('fileSection');
-var fileList  = document.getElementById('fileList');
-var fileCount = document.getElementById('fileCount');
-var resetBtn  = document.getElementById('resetBtn');
+// --- DOM refs ---
+var setupSection = document.getElementById('setupSection');
+var loginSection = document.getElementById('loginSection');
+var fileSection  = document.getElementById('fileSection');
+var loadingBox   = document.getElementById('loadingBox');
+var successBox   = document.getElementById('successBox');
+var errorBox     = document.getElementById('errorBox');
+var setupError   = document.getElementById('setupError');
+var fileList     = document.getElementById('fileList');
+var fileCount    = document.getElementById('fileCount');
+var subtitle     = document.getElementById('subtitle');
 
-setTimeout(function () { input.focus(); }, 100);
+var newCodeInput     = document.getElementById('newCode');
+var confirmCodeInput = document.getElementById('confirmCode');
+var saveBtn          = document.getElementById('saveBtn');
+var accessCodeInput  = document.getElementById('accessCode');
+var okBtn            = document.getElementById('okBtn');
+var forgotBtn        = document.getElementById('forgotBtn');
+var lockBtn          = document.getElementById('lockBtn');
 
-// Build the GitHub API URL for the folder
-function buildApiUrl() {
-  var path = GITHUB_FOLDER ? encodeURIComponent(GITHUB_FOLDER) : "";
-  return "https://api.github.com/repos/" + GITHUB_USER + "/" +
-         GITHUB_REPO + "/contents/" + path +
-         "?ref=" + GITHUB_BRANCH;
+// --- Crypto: SHA-256 hash ---
+async function sha256(text) {
+  var buf = new TextEncoder().encode(text);
+  var hashBuf = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hashBuf))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
-// Fetch the folder contents and show only .pdf files
-function loadPdfs() {
-  loadingBox.style.display = 'block';
+// --- localStorage helpers ---
+function getStoredHash() {
+  return localStorage.getItem(STORAGE_KEY);
+}
+function saveHash(hash) {
+  localStorage.setItem(STORAGE_KEY, hash);
+}
+function clearHash() {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+// --- Show/hide sections ---
+function showSetup() {
+  setupSection.style.display = 'block';
+  loginSection.style.display = 'none';
+  fileSection.style.display  = 'none';
+  subtitle.textContent = 'First time here — please create a security code.';
+  setTimeout(() => newCodeInput.focus(), 100);
+}
+function showLogin() {
+  setupSection.style.display = 'none';
+  loginSection.style.display = 'block';
+  fileSection.style.display  = 'none';
+  subtitle.textContent = 'Enter your code to unlock the PDF folder.';
+  setTimeout(() => accessCodeInput.focus(), 100);
+}
+function showFiles() {
+  setupSection.style.display = 'none';
+  loginSection.style.display = 'none';
+  fileSection.style.display  = 'block';
+  subtitle.textContent = '🔓 Unlocked — click any PDF to open.';
+}
+
+// --- Setup: save new code ---
+async function saveNewCode() {
+  var code1 = newCodeInput.value;
+  var code2 = confirmCodeInput.value;
+
+  setupError.style.display = 'none';
+
+  if (code1.length < 4) {
+    showSetupError('Code must be at least 4 characters.');
+    return;
+  }
+  if (code1 !== code2) {
+    showSetupError('Codes do not match.');
+    return;
+  }
+
+  saveBtn.disabled = true;
+  saveBtn.textContent = '…';
+
+  var hash = await sha256(code1);
+  saveHash(hash);
+
+  saveBtn.disabled = false;
+  saveBtn.textContent = '💾 Save';
+
+  newCodeInput.value = '';
+  confirmCodeInput.value = '';
+
+  // Immediately unlock after setting the code
+  await unlockWithCode(code1);
+}
+
+function showSetupError(msg) {
+  setupError.textContent = '❌ ' + msg;
+  setupError.style.display = 'block';
+}
+
+// --- Login: check code ---
+async function tryUnlock() {
+  var code = accessCodeInput.value;
   errorBox.style.display = 'none';
 
-  var apiUrl = buildApiUrl();
-  console.log('Fetching:', apiUrl);
+  if (!code) {
+    errorBox.textContent = '❌ Please enter a code.';
+    errorBox.style.display = 'block';
+    return;
+  }
 
-  fetch(apiUrl)
-    .then(function (response) {
-      if (!response.ok) {
-        throw new Error('GitHub API error: ' + response.status + ' ' + response.statusText);
-      }
-      return response.json();
-    })
-    .then(function (files) {
-      loadingBox.style.display = 'none';
-
-      if (!Array.isArray(files)) {
-        throw new Error('Unexpected API response');
-      }
-
-      // Filter only PDF files
-      var pdfs = files.filter(function (f) {
-        return f.type === 'file' && f.name.toLowerCase().endsWith('.pdf');
-      });
-
-      if (pdfs.length === 0) {
-        fileList.innerHTML = '<div class="empty-msg">📭 No PDF files found in this folder.</div>';
-        fileCount.textContent = '0';
-      } else {
-        fileList.innerHTML = '';
-        pdfs.forEach(function (file) {
-          var a = document.createElement('a');
-          a.className = 'file-item';
-          a.href = file.download_url;   // direct raw download URL
-          a.target = '_blank';
-          a.rel = 'noopener noreferrer';
-          a.innerHTML = '📄 ' + file.name + '<span class="badge">open</span>';
-          fileList.appendChild(a);
-        });
-        fileCount.textContent = pdfs.length;
-      }
-
-      // Show file section, hide login
-      loginSec.style.display = 'none';
-      fileSec.style.display = 'block';
-      resetBtn.style.display = 'inline-block';
-    })
-    .catch(function (err) {
-      loadingBox.style.display = 'none';
-      console.error(err);
-
-      var msg = '❌ Could not load folder. ';
-      if (err.message.indexOf('404') > -1) {
-        msg += 'Check your GITHUB_USER / GITHUB_REPO / GITHUB_FOLDER.';
-      } else if (err.message.indexOf('403') > -1) {
-        msg += 'GitHub API rate limit. Wait 1 hour or host on GitHub Pages.';
-      } else {
-        msg += err.message;
-      }
-      errorBox.textContent = msg;
-      errorBox.style.display = 'block';
-    });
-}
-
-// Check code
-function checkCode() {
-  if (input.value.trim() === SECRET_CODE) {
-    errorBox.style.display = 'none';
-    loadPdfs();
-  } else {
+  var ok = await unlockWithCode(code);
+  if (!ok) {
     errorBox.textContent = '❌ Wrong code. Try again.';
     errorBox.style.display = 'block';
-    input.focus();
-    input.select();
+    accessCodeInput.focus();
+    accessCodeInput.select();
   }
 }
 
-// Reset
-function reset() {
-  loginSec.style.display = 'block';
-  fileSec.style.display = 'none';
-  resetBtn.style.display = 'none';
-  errorBox.style.display = 'none';
-  loadingBox.style.display = 'none';
+// --- Compare hash & unlock ---
+async function unlockWithCode(code) {
+  var storedHash = getStoredHash();
+  if (!storedHash) {
+    showSetup();
+    return false;
+  }
+
+  var enteredHash = await sha256(code);
+  if (enteredHash !== storedHash) return false;
+
+  accessCodeInput.value = '';
+  await loadPdfs();
+  return true;
+}
+
+// --- Load PDFs from GitHub API ---
+async function loadPdfs() {
+  loadingBox.style.display = 'block';
   fileList.innerHTML = '';
-  input.value = '';
-  input.focus();
+  fileSection.style.display = 'none';
+
+  var path = GITHUB_FOLDER ? encodeURIComponent(GITHUB_FOLDER) : '';
+  var apiUrl = 'https://api.github.com/repos/' + GITHUB_USER + '/' +
+               GITHUB_REPO + '/contents/' + path + '?ref=' + GITHUB_BRANCH;
+
+  console.log('Fetching:', apiUrl);
+
+  try {
+    var res = await fetch(apiUrl);
+    if (!res.ok) {
+      throw new Error('GitHub API ' + res.status + ' ' + res.statusText);
+    }
+    var files = await res.json();
+    if (!Array.isArray(files)) {
+      throw new Error('Unexpected response');
+    }
+
+    var pdfs = files.filter(f =>
+      f.type === 'file' && f.name.toLowerCase().endsWith('.pdf')
+    );
+
+    loadingBox.style.display = 'none';
+
+    if (pdfs.length === 0) {
+      fileList.innerHTML = '<div class="empty-msg">📭 No PDF files in this folder.</div>';
+      fileCount.textContent = '0';
+    } else {
+      pdfs.forEach(f => {
+        var a = document.createElement('a');
+        a.className = 'file-item';
+        a.href = f.download_url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.innerHTML = '📄 ' + f.name + '<span class="badge">open</span>';
+        fileList.appendChild(a);
+      });
+      fileCount.textContent = pdfs.length;
+    }
+
+    showFiles();
+    successBox.style.display = 'none';
+  } catch (err) {
+    loadingBox.style.display = 'none';
+    console.error(err);
+
+    var msg = '❌ Could not load PDFs. ';
+    if (err.message.indexOf('404') > -1) {
+      msg += 'Check GITHUB_USER / GITHUB_REPO / GITHUB_FOLDER.';
+    } else if (err.message.indexOf('403') > -1) {
+      msg += 'GitHub API rate limit hit. Wait 1 hour or host on GitHub Pages.';
+    } else {
+      msg += err.message;
+    }
+    errorBox.textContent = msg;
+    errorBox.style.display = 'block';
+  }
 }
 
-// Events
-okBtn.addEventListener('click', function (e) {
-  e.preventDefault();
-  checkCode();
-});
-
-input.addEventListener('keydown', function (e) {
-  if (e.key === 'Enter' || e.keyCode === 13) {
-    e.preventDefault();
-    checkCode();
+// --- Reset (forgot code) ---
+function resetFolder() {
+  if (!confirm('This will delete your saved code. You will set a new code next time. Continue?')) {
+    return;
   }
+  clearHash();
+  accessCodeInput.value = '';
+  errorBox.style.display = 'none';
+  fileSection.style.display = 'none';
+  showSetup();
+}
+
+// --- Lock again ---
+function lockAgain() {
+  fileSection.style.display = 'none';
+  fileList.innerHTML = '';
+  accessCodeInput.value = '';
+  showLogin();
+}
+
+// --- Event listeners ---
+saveBtn.addEventListener('click', function (e) { e.preventDefault(); saveNewCode(); });
+okBtn.addEventListener('click',   function (e) { e.preventDefault(); tryUnlock(); });
+forgotBtn.addEventListener('click', function (e) { e.preventDefault(); resetFolder(); });
+lockBtn.addEventListener('click',   function (e) { e.preventDefault(); lockAgain(); });
+
+// Enter key
+newCodeInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); confirmCodeInput.focus(); }
+});
+confirmCodeInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); saveNewCode(); }
+});
+accessCodeInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); tryUnlock(); }
 });
 
-resetBtn.addEventListener('click', function (e) {
-  e.preventDefault();
-  reset();
-});
+// --- Boot ---
+(async function boot() {
+  // Ensure crypto.subtle is available (needs HTTPS or localhost)
+  if (!window.crypto || !crypto.subtle) {
+    document.body.innerHTML =
+      '<div style="padding:40px;color:#fff;font-family:sans-serif;text-align:center;">' +
+      '<h2>⚠️ Secure context required</h2>' +
+      '<p>crypto.subtle only works on <b>HTTPS</b> or <b>localhost</b>.</p>' +
+      '<p>Host this file on GitHub Pages, or open via <code>http://localhost</code>.</p>' +
+      '</div>';
+    return;
+  }
+
+  var storedHash = getStoredHash();
+  if (storedHash) {
+    showLogin();
+  } else {
+    showSetup();
+  }
+})();
 </script>
 
 </body>
