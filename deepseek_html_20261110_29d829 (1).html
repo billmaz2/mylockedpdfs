@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>folder gateway · file list</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(145deg, #0e1a2b 0%, #1b2c42 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .gateway-card {
+      background: rgba(22, 34, 50, 0.9);
+      backdrop-filter: blur(12px);
+      border-radius: 2.5rem;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 720px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(120, 180, 255, 0.2);
+      border: 1px solid #2e4a6b;
+      transition: all 0.2s;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 500;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      color: #e7f0ff;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    h1 span {
+      background: #1f6feb22;
+      border-radius: 100px;
+      font-size: 1.3rem;
+      padding: 0.2rem 1rem;
+      color: #7ab7ff;
+      border: 1px solid #2d5f9b;
+    }
+
+    .subtitle {
+      color: #9bb5d4;
+      margin-bottom: 2.2rem;
+      font-size: 1rem;
+      border-left: 3px solid #2d6db5;
+      padding-left: 1rem;
+      background: #0f1a26;
+      border-radius: 0 8px 8px 0;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .code-input-area {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+    }
+
+    .code-input-area label {
+      color: #b6cde9;
+      font-weight: 500;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.8;
+    }
+
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .input-group input {
+      flex: 1 1 200px;
+      background: #0b141f;
+      border: 1px solid #2a405c;
+      border-radius: 40px;
+      padding: 0.9rem 1.4rem;
+      font-size: 1.1rem;
+      color: #e2edff;
+      outline: none;
+      transition: 0.2s;
+      box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .input-group input:focus {
+      border-color: #3f8eff;
+      box-shadow: 0 0 0 3px #1f6feb44, inset 0 2px 6px #00000066;
+    }
+
+    .input-group button {
+      background: #1f6feb;
+      border: none;
+      border-radius: 40px;
+      padding: 0.9rem 2.2rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: 0.15s;
+      box-shadow: 0 10px 18px -8px #0b1b33;
+      border: 1px solid #5a9aff;
+      white-space: nowrap;
+    }
+
+    .input-group button:hover {
+      background: #2d7ef7;
+      transform: scale(1.02);
+      border-color: #8bbaff;
+    }
+
+    .input-group button:active {
+      transform: scale(0.98);
+      background: #1a5fcf;
+    }
+
+    .error-message {
+      color: #ffa6a6;
+      background: #4d1f1faa;
+      border-left: 5px solid #ff5e5e;
+      padding: 0.8rem 1.2rem;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      margin-top: 0.5rem;
+      backdrop-filter: blur(4px);
+      font-weight: 500;
+      display: none;
+    }
+
+    .file-section {
+      margin-top: 2rem;
+      border-top: 1px dashed #2d4a6e;
+      padding-top: 1.8rem;
+      display: none;
+    }
+
+    .file-section h2 {
+      color: #c3d9f5;
+      font-weight: 400;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0;
+      margin-bottom: 1.2rem;
+      letter-spacing: -0.2px;
+    }
+
+    .file-section h2 i {
+      font-style: normal;
+      background: #1f6feb22;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      color: #8bbdff;
+      border: 1px solid #2f5c8a;
+    }
+
+    .file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      max-height: 360px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .file-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .file-list::-webkit-scrollbar-track {
+      background: #0b141f;
+      border-radius: 10px;
+    }
+
+    .file-list::-webkit-scrollbar-thumb {
+      background: #2f5680;
+      border-radius: 10px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      background: #101e2e;
+      border-radius: 14px;
+      padding: 0.6rem 1.2rem;
+      border: 1px solid #1f3750;
+      transition: 0.15s;
+      text-decoration: none;
+      color: #d2e3ff;
+      font-size: 1rem;
+      word-break: break-all;
+    }
+
+    .file-item:hover {
+      background: #1c2f45;
+      border-color: #3b77c0;
+      transform: translateX(4px);
+      box-shadow: 0 6px 12px -6px #00000080;
+    }
+
+    .file-icon {
+      margin-right: 12px;
+      font-size: 1.2rem;
+      opacity: 0.8;
+      width: 24px;
+      text-align: center;
+      filter: drop-shadow(0 2px 2px black);
+    }
+
+    .file-name {
+      flex: 1;
+    }
+
+    .file-badge {
+      color: #7196bb;
+      font-size: 0.75rem;
+      background: #1d3147;
+      padding: 0.2rem 0.7rem;
+      border-radius: 30px;
+      border: 1px solid #314e70;
+      margin-left: 10px;
+      white-space: nowrap;
+    }
+
+    .empty-message {
+      color: #7e9bbe;
+      padding: 1.5rem;
+      text-align: center;
+      background: #0b141f;
+      border-radius: 20px;
+      border: 1px dashed #314e70;
+      font-style: italic;
+    }
+
+    .back-link {
+      margin-top: 1.8rem;
+      font-size: 0.85rem;
+      color: #5d7ea0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="gateway-card" id="gatewayCard">
+    <h1>
+      🔐 folder gateway
+      <span>github</span>
+    </h1>
+    <div class="subtitle">
+      ⚡ Enter access code to reveal all files in this directory.
+    </div>
+
+    <!-- code input area -->
+    <div class="code-input-area" id="codeInputArea">
+      <label for="accessCode">access code</label>
+      <div class="input-group">
+        <input type="text" id="accessCode" placeholder="e.g. 1234 or secret" autocomplete="off" autofocus>
+        <button id="submitCodeBtn">🔓 OK</button>
+      </div>
+      <div id="errorMsg" class="error-message"></div>
+    </div>
+
+    <!-- file section (hidden by default) -->
+    <div id="fileSection" class="file-section">
+      <h2>
+        📁 files in this folder
+        <i id="fileCount">0</i>
+      </h2>
+      <div id="fileListContainer" class="file-list">
+        <!-- filled dynamically -->
+      </div>
+    </div>
+    <div class="back-link" id="backLink" style="display: none;">
+      <a href="#" id="resetView" style="color: #4d7eb3; text-decoration: none;">↻ use another code</a>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- CONFIGURATION ----------
+      // The secret code you must enter. Change this to whatever you like.
+      const SECRET_CODE = "github";   // <-- SET YOUR CODE HERE
+
+      // GitHub folder URL (raw files). The script will append filenames to this base.
+      // MUST end with a slash.
+      const GITHUB_FOLDER_BASE = "https://github.com/yourusername/yourrepo/raw/main/yourfolder/"; 
+      // ^^^ REPLACE THIS with your actual GitHub folder path.
+      // Example: "https://raw.githubusercontent.com/user/repo/main/docs/"
+      // Or:      "https://github.com/user/repo/raw/main/files/"
+      
+      // The list of filenames you want to display (simulate folder contents).
+      // In a real scenario, you would generate this list dynamically.
+      // For GitHub pages you could fetch a directory listing, but here we use a hardcoded array.
+      // REPLACE THESE with your actual file names inside the github folder.
+      const FILE_NAMES = [
+        "document.pdf",
+        "image.png",
+        "data.csv",
+        "script.js",
+        "style.css",
+        "notes.txt",
+        "archive.zip",
+        "readme.md",
+        "config.json",
+        "index.html"
+      ];
+
+      // ---------- DOM refs ----------
+      const accessCodeInput = document.getElementById('accessCode');
+      const submitBtn = document.getElementById('submitCodeBtn');
+      const errorMsgDiv = document.getElementById('errorMsg');
+      const codeInputArea = document.getElementById('codeInputArea');
+      const fileSection = document.getElementById('fileSection');
+      const fileListContainer = document.getElementById('fileListContainer');
+      const fileCountSpan = document.getElementById('fileCount');
+      const backLink = document.getElementById('backLink');
+      const resetViewLink = document.getElementById('resetView');
+
+      // ---------- state ----------
+      let filesShown = false;
+
+      // ---------- helper: build file list with links ----------
+      function renderFileList() {
+        // Clear container
+        fileListContainer.innerHTML = '';
+
+        if (!FILE_NAMES || FILE_NAMES.length === 0) {
+          fileListContainer.innerHTML = `<div class="empty-message">📭 no files in this folder</div>`;
+          fileCountSpan.textContent = '0';
+          return;
+        }
+
+        // Sanitize and build links
+        const baseUrl = GITHUB_FOLDER_BASE.endsWith('/') ? GITHUB_FOLDER_BASE : GITHUB_FOLDER_BASE + '/';
+        
+        FILE_NAMES.forEach((fileName) => {
+          // Basic filename safety — remove path traversal, trim
+          const cleanName = fileName.replace(/[\/\\]/g, '_').trim();
+          if (!cleanName) return;
+
+          const fullUrl = baseUrl + encodeURIComponent(cleanName);
+
+          // Create item
+          const link = document.createElement('a');
+          link.href = fullUrl;
+          link.className = 'file-item';
+          link.target = '_blank';  // open in new tab
+          link.rel = 'noopener noreferrer';
+
+          // icon (simple)
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'file-icon';
+          // choose icon by extension
+          const ext = cleanName.split('.').pop().toLowerCase();
+          const iconMap = {
+            pdf: '📄', txt: '📄', md: '📝', js: '📜', json: '📋',
+            css: '🎨', html: '🌐', htm: '🌐', png: '🖼️', jpg: '🖼️',
+            jpeg: '🖼️', gif: '🖼️', svg: '🖼️', csv: '📊', zip: '📦',
+            mp3: '🎵', mp4: '🎬', doc: '📄', docx: '📄', xls: '📊',
+            xlsx: '📊', ppt: '📽️', pptx: '📽️', py: '🐍', java: '☕'
+          };
+          iconSpan.textContent = iconMap[ext] || '📎';
+
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'file-name';
+          nameSpan.textContent = cleanName;
+
+          const badgeSpan = document.createElement('span');
+          badgeSpan.className = 'file-badge';
+          badgeSpan.textContent = 'open';
+
+          link.appendChild(iconSpan);
+          link.appendChild(nameSpan);
+          link.appendChild(badgeSpan);
+
+          fileListContainer.appendChild(link);
+        });
+
+        // update count
+        fileCountSpan.textContent = FILE_NAMES.length;
+      }
+
+      // ---------- show file list and hide input ----------
+      function unlockAndShowFiles() {
+        if (filesShown) return;
+        filesShown = true;
+
+        // hide code input & error, show file section and reset link
+        codeInputArea.style.display = 'none';
+        errorMsgDiv.style.display = 'none';
+        fileSection.style.display = 'block';
+        backLink.style.display = 'block';
+
+        // populate list
+        renderFileList();
+      }
+
+      // ---------- reset to code entry ----------
+      function resetToCodeEntry() {
+        filesShown = false;
+        codeInputArea.style.display = 'flex'; // it was flex container
+        fileSection.style.display = 'none';
+        backLink.style.display = 'none';
+        errorMsgDiv.style.display = 'none';
+        accessCodeInput.value = '';
+        accessCodeInput.focus();
+        // Clear file list to avoid stale data
+        fileListContainer.innerHTML = '';
+      }
+
+      // ---------- validate code and act ----------
+      function checkCodeAndProceed() {
+        const entered = accessCodeInput.value.trim();
+        
+        if (entered === SECRET_CODE) {
+          // Correct code: hide error, unlock
+          errorMsgDiv.style.display = 'none';
+          unlockAndShowFiles();
+        } else {
+          // Show error
+          errorMsgDiv.textContent = '❌ Invalid code. Please try again.';
+          errorMsgDiv.style.display = 'block';
+          accessCodeInput.focus();
+          accessCodeInput.select();
+        }
+      }
+
+      // ---------- event listeners ----------
+      submitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        checkCodeAndProceed();
+      });
+
+      // allow Enter key in input
+      accessCodeInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          checkCodeAndProceed();
+        }
+      });
+
+      // reset link
+      resetViewLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        resetToCodeEntry();
+      });
+
+      // optional: auto-focus on load
+      window.addEventListener('load', () => {
+        accessCodeInput.focus();
+      });
+
+      // If the file section is hidden initially, ensure input area visible
+      // (already default)
+    })();
+  </script>
+</body>
+</html>
