@@ -277,7 +277,7 @@
     <div class="code-input-area" id="codeInputArea">
       <label for="accessCode">access code</label>
       <div class="input-group">
-        <input type="text" id="accessCode" placeholder="e.g. 1234 or secret" autocomplete="off" autofocus>
+        <input type="text" id="accessCode" placeholder="enter code 1234" autocomplete="off" autofocus>
         <button id="submitCodeBtn">🔓 OK</button>
       </div>
       <div id="errorMsg" class="error-message"></div>
@@ -300,21 +300,18 @@
 
   <script>
     (function() {
+      // ============================================
       // ---------- CONFIGURATION ----------
-      // The secret code you must enter. Change this to whatever you like.
-      const SECRET_CODE = "github";   // <-- SET YOUR CODE HERE
+      // ============================================
 
-      // GitHub folder URL (raw files). The script will append filenames to this base.
-      // MUST end with a slash.
-      const GITHUB_FOLDER_BASE = "https://github.com/yourusername/yourrepo/raw/main/yourfolder/"; 
-      // ^^^ REPLACE THIS with your actual GitHub folder path.
-      // Example: "https://raw.githubusercontent.com/user/repo/main/docs/"
-      // Or:      "https://github.com/user/repo/raw/main/files/"
-      
-      // The list of filenames you want to display (simulate folder contents).
-      // In a real scenario, you would generate this list dynamically.
-      // For GitHub pages you could fetch a directory listing, but here we use a hardcoded array.
-      // REPLACE THESE with your actual file names inside the github folder.
+      // ✅ Secret code — set to 1234
+      const SECRET_CODE = "1234";
+
+      // ⚠️ CHANGE THIS — your GitHub folder URL (must end with /)
+      // Example: "https://github.com/alice/myproject/raw/main/files/"
+      const GITHUB_FOLDER_BASE = "https://github.com/yourusername/yourrepo/raw/main/yourfolder/";
+
+      // ⚠️ CHANGE THIS — exact filenames inside that folder (case-sensitive!)
       const FILE_NAMES = [
         "document.pdf",
         "image.png",
@@ -328,7 +325,9 @@
         "index.html"
       ];
 
+      // ============================================
       // ---------- DOM refs ----------
+      // ============================================
       const accessCodeInput = document.getElementById('accessCode');
       const submitBtn = document.getElementById('submitCodeBtn');
       const errorMsgDiv = document.getElementById('errorMsg');
@@ -344,7 +343,6 @@
 
       // ---------- helper: build file list with links ----------
       function renderFileList() {
-        // Clear container
         fileListContainer.innerHTML = '';
 
         if (!FILE_NAMES || FILE_NAMES.length === 0) {
@@ -353,27 +351,24 @@
           return;
         }
 
-        // Sanitize and build links
-        const baseUrl = GITHUB_FOLDER_BASE.endsWith('/') ? GITHUB_FOLDER_BASE : GITHUB_FOLDER_BASE + '/';
-        
+        const baseUrl = GITHUB_FOLDER_BASE.endsWith('/')
+          ? GITHUB_FOLDER_BASE
+          : GITHUB_FOLDER_BASE + '/';
+
         FILE_NAMES.forEach((fileName) => {
-          // Basic filename safety — remove path traversal, trim
           const cleanName = fileName.replace(/[\/\\]/g, '_').trim();
           if (!cleanName) return;
 
           const fullUrl = baseUrl + encodeURIComponent(cleanName);
 
-          // Create item
           const link = document.createElement('a');
           link.href = fullUrl;
           link.className = 'file-item';
-          link.target = '_blank';  // open in new tab
+          link.target = '_blank';
           link.rel = 'noopener noreferrer';
 
-          // icon (simple)
           const iconSpan = document.createElement('span');
           iconSpan.className = 'file-icon';
-          // choose icon by extension
           const ext = cleanName.split('.').pop().toLowerCase();
           const iconMap = {
             pdf: '📄', txt: '📄', md: '📝', js: '📜', json: '📋',
@@ -399,48 +394,42 @@
           fileListContainer.appendChild(link);
         });
 
-        // update count
         fileCountSpan.textContent = FILE_NAMES.length;
       }
 
-      // ---------- show file list and hide input ----------
+      // ---------- unlock ----------
       function unlockAndShowFiles() {
         if (filesShown) return;
         filesShown = true;
 
-        // hide code input & error, show file section and reset link
         codeInputArea.style.display = 'none';
         errorMsgDiv.style.display = 'none';
         fileSection.style.display = 'block';
         backLink.style.display = 'block';
 
-        // populate list
         renderFileList();
       }
 
-      // ---------- reset to code entry ----------
+      // ---------- reset ----------
       function resetToCodeEntry() {
         filesShown = false;
-        codeInputArea.style.display = 'flex'; // it was flex container
+        codeInputArea.style.display = 'flex';
         fileSection.style.display = 'none';
         backLink.style.display = 'none';
         errorMsgDiv.style.display = 'none';
         accessCodeInput.value = '';
         accessCodeInput.focus();
-        // Clear file list to avoid stale data
         fileListContainer.innerHTML = '';
       }
 
-      // ---------- validate code and act ----------
+      // ---------- validate ----------
       function checkCodeAndProceed() {
         const entered = accessCodeInput.value.trim();
-        
+
         if (entered === SECRET_CODE) {
-          // Correct code: hide error, unlock
           errorMsgDiv.style.display = 'none';
           unlockAndShowFiles();
         } else {
-          // Show error
           errorMsgDiv.textContent = '❌ Invalid code. Please try again.';
           errorMsgDiv.style.display = 'block';
           accessCodeInput.focus();
@@ -448,13 +437,12 @@
         }
       }
 
-      // ---------- event listeners ----------
+      // ---------- events ----------
       submitBtn.addEventListener('click', (e) => {
         e.preventDefault();
         checkCodeAndProceed();
       });
 
-      // allow Enter key in input
       accessCodeInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
@@ -462,19 +450,14 @@
         }
       });
 
-      // reset link
       resetViewLink.addEventListener('click', (e) => {
         e.preventDefault();
         resetToCodeEntry();
       });
 
-      // optional: auto-focus on load
       window.addEventListener('load', () => {
         accessCodeInput.focus();
       });
-
-      // If the file section is hidden initially, ensure input area visible
-      // (already default)
     })();
   </script>
 </body>
